@@ -2,7 +2,12 @@
 name = "git-easy-checkout"
 version = "0.1.0"
 edition = "2021"
+build = "build.rs"
 
 [dependencies]
+clap = { version = "4.3.19", features = ["derive"] }
 inquire = "0.6.2"
 itertools = "0.11.0"
+
+[build-dependencies]
+vergen = { version = "8.2.4", features = ["build", "git", "gitcl"] }

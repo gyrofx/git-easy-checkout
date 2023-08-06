@@ -1,11 +1,21 @@
+use clap::Parser;
 use inquire::Select;
 use itertools::{Either, Itertools};
 use std::{
-    process::{Command, Stdio},
+    process::{exit, Command, Stdio},
     str::from_utf8,
 };
 
+#[derive(Parser, Debug)]
+#[command(author, about, long_about = None)]
+struct Cli {
+    #[clap(long, action)]
+    version: bool,
+}
+
 fn main() {
+    parse_and_handle_cli_arguments();
+
     inside_git_worktree_or_panic();
 
     let (_, branch_list) = branches();
@@ -71,4 +81,18 @@ fn command_output(command: &str, args: &[&str]) -> String {
         .expect("failed to execute git command");
 
     from_utf8(&output.stdout).unwrap().to_string()
+}
+
+fn parse_and_handle_cli_arguments() {
+    let cli = Cli::parse();
+
+    if cli.version {
+        print_version_and_exit();
+    }
+}
+
+fn print_version_and_exit() {
+    println!("Build timestamp: {}", env!("VERGEN_BUILD_TIMESTAMP"));
+    println!("git revision: {}", env!("VERGEN_GIT_DESCRIBE"));
+    exit(0);
 }
