@@ -4,6 +4,12 @@ Maybe it's just me, but sometimes when I switch branches I can't remember the ex
 
 I'm pretty sure there are other tools or scripts out there that do the same thing, but I just want to write my own in `rust` :)
 
+## Installation
+
+```bash
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/gyrofx/git-easy-checkout/main/install.sh)"
+```
+
 ## Usage
 
 ```bash
