@@ -20,9 +20,7 @@ fn main() {
 
     let (_, branch_list) = branches();
 
-    let chosen_branch = Select::new("Select branch to checkout", branch_list)
-        .prompt()
-        .unwrap();
+    let chosen_branch = show_branch_selector(branch_list);
 
     checkout_branch(chosen_branch);
 }
@@ -65,6 +63,13 @@ fn branches() -> (String, Vec<String>) {
             .expect("Missing current branch"),
         branch_listt,
     );
+}
+
+fn show_branch_selector(branch_list: Vec<String>) -> String {
+    let chosen_branch = Select::new("Select branch to checkout", branch_list)
+        .prompt()
+        .unwrap();
+    chosen_branch
 }
 
 fn checkout_branch(chosen_branch: String) {
