@@ -1,6 +1,12 @@
+mod branch;
+mod checkout;
+
+use branch::{branches, Branch};
+use checkout::checkout_branch;
 use clap::Parser;
+use core::panic;
 use inquire::Select;
-use itertools::{Either, Itertools};
+
 use std::{
     process::{exit, Command, Stdio},
     str::from_utf8,
@@ -18,7 +24,7 @@ fn main() {
 
     inside_git_worktree_or_panic();
 
-    let (_, branch_list) = branches();
+    let branch_list = branches();
 
     let chosen_branch = show_branch_selector(branch_list);
 
@@ -37,46 +43,22 @@ fn inside_git_worktree_or_panic() {
     }
 }
 
-fn branches() -> (String, Vec<String>) {
-    let (current_branch, branch_listt): (Vec<String>, Vec<String>) = command_output(
-        "git",
-        &[
-            "branch",
-            "-a",
-            "--no-color",
-            "--no-abbrev",
-            "--sort=-committerdate",
-        ],
-    )
-    .split("\n")
-    .map(str::trim)
-    .map(str::to_string)
-    .partition_map(|r| match r.starts_with('*') {
-        true => Either::Left(r),
-        false => Either::Right(r),
-    });
+fn show_branch_selector(branch_list: Vec<Branch>) -> Branch {
+    let branch_list_as_strings = branch_list
+        .iter()
+        .map(|b| b.name.clone())
+        .collect::<Vec<_>>();
 
-    return (
-        current_branch
-            .into_iter()
-            .nth(0)
-            .expect("Missing current branch"),
-        branch_listt,
-    );
-}
+    let chosen_branch_as_str: String =
+        Select::new("Select branch to checkout", branch_list_as_strings)
+            .prompt()
+            .unwrap();
 
-fn show_branch_selector(branch_list: Vec<String>) -> String {
-    let chosen_branch = Select::new("Select branch to checkout", branch_list)
-        .prompt()
+    let chosen_branch = branch_list
+        .into_iter()
+        .find(|b| b.name.eq(&chosen_branch_as_str))
         .unwrap();
     chosen_branch
-}
-
-fn checkout_branch(chosen_branch: String) {
-    Command::new("git")
-        .args(&["checkout", chosen_branch.as_str()])
-        .status()
-        .expect("git could not be executed");
 }
 
 fn command_output(command: &str, args: &[&str]) -> String {
@@ -84,7 +66,6 @@ fn command_output(command: &str, args: &[&str]) -> String {
         .args(args)
         .output()
         .expect("failed to execute git command");
-
     from_utf8(&output.stdout).unwrap().to_string()
 }
 
