@@ -54,8 +54,6 @@ fn tracked_remote_branches() -> HashMap<String, String> {
 }
 
 fn parse_branch(branch: String, tracked_remote_branches: &HashMap<String, String>) -> Branch {
-    println!("branch {:?}", branch);
-
     let is_current = branch.starts_with('*');
     let is_remote = branch.starts_with("remotes/");
     let name = branch
