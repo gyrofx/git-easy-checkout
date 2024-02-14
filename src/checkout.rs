@@ -18,9 +18,9 @@ pub fn checkout_local_branch(branch: Branch) {
 }
 
 pub fn checkout_remote_branch(branch: Branch) {
-    let new_branch_name = branch.name.trim_start_matches("/origin/");
+    let new_branch_name = branch.name.trim_start_matches("origin/");
     Command::new("git")
-        .args(&["switch", "-c", new_branch_name, branch.name.as_str()])
+        .args(&["checkout", "-b", new_branch_name, branch.name.as_str()])
         .status()
         .expect("git could not be executed");
 }
